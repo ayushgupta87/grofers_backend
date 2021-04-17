@@ -6,8 +6,9 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from werkzeug.serving import WSGIRequestHandler
 
+from resources.cart_resources import AddItemToCart, DeleteItemFromCart, EditQty
 from resources.database_resources import GetItems
-from resources.users_resources import RegisterUser, LoginUser, RefreshAccessToken
+from resources.users_resources import RegisterUser, LoginUser, RefreshAccessToken, GetCuttentUser
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///ayushApp.db')
@@ -30,9 +31,16 @@ def create_tables():
 api.add_resource(RegisterUser, '/ayush/api/register')
 api.add_resource(LoginUser, '/ayush/api/login')
 api.add_resource(RefreshAccessToken, '/ayush/api/refreshToken')
+api.add_resource(GetCuttentUser, '/ayush/api/currentUser')
 
 # get items
 api.add_resource(GetItems, '/ayush/api/items/<string:item_category>')
+
+# cart requests
+api.add_resource(AddItemToCart, '/ayush/api/addItemToCart')
+api.add_resource(DeleteItemFromCart, '/ayush/api/deleteFromCart/<string:item>')
+api.add_resource(EditQty, '/ayush/api/editCartItemQty/<string:item>/<string:qty>')
+
 
 if __name__ == '__main__':
     from db import db

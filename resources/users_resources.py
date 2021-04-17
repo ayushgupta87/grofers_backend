@@ -91,3 +91,17 @@ class RefreshAccessToken(Resource):
         identity = get_jwt_identity()
         access_token = create_access_token(identity=identity, fresh=True)
         return {'access_token': access_token}, 200
+
+
+class GetCuttentUser(Resource):
+
+    @jwt_required()
+    def get(self):
+        userDetails = UserModel.find_by_username(get_jwt_identity())
+        if not userDetails:
+            return {'message': 'Unauthorized'}, 400
+        currentUser = get_jwt_identity()
+
+        if currentUser:
+            return {'message': currentUser}, 200
+        return {'message': 'Unauthorized'}, 400

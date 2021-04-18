@@ -6,7 +6,7 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from werkzeug.serving import WSGIRequestHandler
 
-from resources.cart_resources import AddItemToCart, DeleteItemFromCart, EditQty
+from resources.cart_resources import AddItemToCart, DeleteItemFromCart, EditQty, GetAllCartItems, GetCartItemsCount
 from resources.database_resources import GetItems
 from resources.users_resources import RegisterUser, LoginUser, RefreshAccessToken, GetCuttentUser
 
@@ -34,12 +34,14 @@ api.add_resource(RefreshAccessToken, '/ayush/api/refreshToken')
 api.add_resource(GetCuttentUser, '/ayush/api/currentUser')
 
 # get items
-api.add_resource(GetItems, '/ayush/api/items/<string:item_category>')
+api.add_resource(GetItems, '/ayush/api/items')
 
 # cart requests
 api.add_resource(AddItemToCart, '/ayush/api/addItemToCart')
 api.add_resource(DeleteItemFromCart, '/ayush/api/deleteFromCart/<string:item>')
 api.add_resource(EditQty, '/ayush/api/editCartItemQty/<string:item>/<string:qty>')
+api.add_resource(GetAllCartItems, '/ayush/api/cartItems')
+api.add_resource(GetCartItemsCount, '/ayush/api/cartItemsLen')
 
 
 if __name__ == '__main__':

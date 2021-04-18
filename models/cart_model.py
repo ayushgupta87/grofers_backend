@@ -24,7 +24,6 @@ class CartModel(db.Model):
 
     def cart_json(self):
         return {
-            'username': self.username,
             'item': self.item,
             'qty': self.qty,
             'kg': self.kg,
@@ -41,6 +40,11 @@ class CartModel(db.Model):
         return cls.query.filter_by(username=username,
                                    item=item,
                                    checkout='0').first()
+
+    @classmethod
+    def find_by_username_cart(cls, username):
+        return cls.query.filter_by(username=username,
+                                   checkout='0').all()
 
     def save_to_db(self):
         db.session.add(self)

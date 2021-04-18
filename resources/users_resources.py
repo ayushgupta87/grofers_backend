@@ -103,5 +103,5 @@ class GetCuttentUser(Resource):
         currentUser = get_jwt_identity()
 
         if currentUser:
-            return {'message': currentUser}, 200
+            return {'user': currentUser}, 200
         return {'message': 'Unauthorized'}, 400

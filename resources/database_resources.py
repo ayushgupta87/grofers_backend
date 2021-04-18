@@ -6,11 +6,11 @@ from models.database_model import DatabaseModel
 
 class GetItems(Resource):
     @jwt_required()
-    def get(self, item_category):
-        categoryExists = DatabaseModel.find_all_by_category(str(item_category).lower().strip())
+    def get(self):
+        categoryExists = DatabaseModel.find_all()
 
         if categoryExists:
             return {'items': list(
                 map(lambda x: x.item_json(),
-                    DatabaseModel.find_all_by_category(str(item_category).lower().strip())))}, 200
+                    DatabaseModel.find_all()))}, 200
         return {'message': 'Items not found'}, 400

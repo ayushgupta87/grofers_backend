@@ -45,13 +45,16 @@ class AddItemToCart(Resource):
 
         if checkItem:
             return {'message': 'Item already in your database'}, 400
+
+        discountedPrice = int(inDbCheck.price_per_kg) - ((int(inDbCheck.discount_percentage)/100)* (int(inDbCheck.price_per_kg)))
+
         try:
             addItemToCart = CartModel(
                 str(currentUser).lower().strip(),
                 str(data['item']).title().strip(),
                 data['qty'],
                 data['kg'],
-                inDbCheck.price_per_kg,
+                str(round(discountedPrice)),
             )
             addItemToCart.save_to_db()
             return {'message': 'Item added to your cart'}, 200
@@ -97,10 +100,45 @@ class EditQty(Resource):
             return {'message': 'Quantity must be in numerical'}, 400
         try:
             checkItem.qty = str(qty)
+            checkItem.save_to_db()
             return {'message': 'Quantity updated'}, 200
         except Exception as e:
             print(f'Exception while updating quantity {e}')
             return {'message': 'Something went wrong'}, 500
 
+
+class GetAllCartItems(Resource):
+    @jwt_required()
+    def get(self):
+        userDetails = UserModel.find_by_username(get_jwt_identity())
+        if not userDetails:
+            return {'message': 'Unauthorized'}, 400
+        currentUser = get_jwt_identity()
+
+        cartItemsExists = CartModel.find_by_username_cart(currentUser)
+
+        if cartItemsExists:
+            return {'cart': list(
+                map(lambda x: x.cart_json(),
+                    CartModel.find_by_username_cart(currentUser)))}, 200
+        return {'message': 'Items not found'}, 400
+
+
+class GetCartItemsCount(Resource):
+    @jwt_required()
+    def get(self):
+
+        userDetails = UserModel.find_by_username(get_jwt_identity())
+        if not userDetails:
+            return {'message': 'Unauthorized'}, 400
+        currentUser = get_jwt_identity()
+
+        cartItemsExists = CartModel.find_by_username_cart(currentUser)
+
+        if cartItemsExists:
+            return {'len': len(list(
+                map(lambda x: x.cart_json(),
+                    CartModel.find_by_username_cart(currentUser))))}, 200
+        return {'message': 'Items not found'}, 400
 
 

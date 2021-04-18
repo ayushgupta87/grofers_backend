@@ -46,7 +46,8 @@ class AddItemToCart(Resource):
         if checkItem:
             return {'message': 'Item already in your database'}, 400
 
-        discountedPrice = int(inDbCheck.price_per_kg) - ((int(inDbCheck.discount_percentage)/100)* (int(inDbCheck.price_per_kg)))
+        discountedPrice = int(inDbCheck.price_per_kg) - (
+                    (int(inDbCheck.discount_percentage) / 100) * (int(inDbCheck.price_per_kg)))
 
         try:
             addItemToCart = CartModel(
@@ -140,5 +141,38 @@ class GetCartItemsCount(Resource):
                 map(lambda x: x.cart_json(),
                     CartModel.find_by_username_cart(currentUser))))}, 200
         return {'message': 'Items not found'}, 400
+
+
+class AddOrEditNote(Resource):
+    @jwt_required()
+    def put(self):
+        userDetails = UserModel.find_by_username(get_jwt_identity())
+        if not userDetails:
+            return {'message': 'Unauthorized'}, 400
+        currentUser = get_jwt_identity()
+
+        _editNote_parser = reqparse.RequestParser()
+        _editNote_parser.add_argument('item',
+                                      type=str,
+                                      required=True,
+                                      help='Item name required')
+        _editNote_parser.add_argument('Note',
+                                      type=str,
+                                      required=False)
+        data = _editNote_parser.parse_args()
+
+        checkItem = CartModel.find_by_username_item_cart(str(currentUser).lower().strip(),
+                                                         str(data['item']).title().strip())
+
+        if not checkItem:
+            return {'message': 'Requested item not in your cart'}, 400
+
+        try:
+            checkItem.note = data['Note']
+            checkItem.save_to_db()
+            return {'message' : 'Note Saved Successfully'}, 200
+        except Exception as e:
+            print(f'Error while Saving note {e}')
+            return {'message' : 'Something went wrong'}, 500
 
 
